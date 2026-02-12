@@ -1,0 +1,714 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Starlight Oracle</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700&family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg-deep: #0a0a0f;
+            --accent-gold: #f4d03f;
+            --mystic-purple: #9b59b6;
+            --celestial-blue: #3498db;
+            --text-ivory: #f5f5dc;
+        }
+
+        body {
+            min-height: 100vh;
+            background: var(--bg-deep);
+            font-family: 'Cormorant Garamond', serif;
+            color: var(--text-ivory);
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* Cosmic Background */
+        .cosmic-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background:
+                radial-gradient(ellipse at 20% 20%, rgba(155, 89, 182, 0.15) 0%, transparent 50%),
+                radial-gradient(ellipse at 80% 80%, rgba(52, 152, 219, 0.1) 0%, transparent 50%),
+                radial-gradient(ellipse at 50% 50%, rgba(244, 208, 63, 0.05) 0%, transparent 70%),
+                var(--bg-deep);
+            z-index: 0;
+        }
+
+        /* Vignette */
+        .vignette {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(ellipse at center, transparent 40%, rgba(0,0,0,0.7) 100%);
+            pointer-events: none;
+            z-index: 10;
+        }
+
+        /* Star Canvas */
+        #starCanvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+        }
+
+        /* Main Container */
+        .container {
+            position: relative;
+            z-index: 5;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+        }
+
+        /* Title */
+        .title {
+            font-family: 'Cinzel Decorative', serif;
+            font-size: clamp(2rem, 6vw, 4rem);
+            font-weight: 700;
+            text-align: center;
+            margin-bottom: 2rem;
+            background: linear-gradient(135deg, var(--accent-gold), #fff, var(--accent-gold));
+            background-size: 200% 200%;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: shimmer 3s ease-in-out infinite;
+            text-shadow: 0 0 40px rgba(244, 208, 63, 0.5);
+            filter: drop-shadow(0 0 20px rgba(244, 208, 63, 0.3));
+        }
+
+        @keyframes shimmer {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+
+        /* Oracle Orb */
+        .oracle-container {
+            position: relative;
+            width: 200px;
+            height: 200px;
+            margin: 2rem 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .oracle-orb {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            background: radial-gradient(circle at 30% 30%,
+                rgba(255, 255, 255, 0.9) 0%,
+                rgba(244, 208, 63, 0.8) 30%,
+                rgba(244, 160, 63, 0.6) 60%,
+                rgba(155, 89, 182, 0.4) 100%);
+            box-shadow:
+                0 0 60px rgba(244, 208, 63, 0.6),
+                0 0 120px rgba(244, 208, 63, 0.4),
+                0 0 180px rgba(244, 208, 63, 0.2),
+                inset 0 0 60px rgba(255, 255, 255, 0.3);
+            animation: orbPulse 3s ease-in-out infinite;
+            transition: all 0.5s ease;
+        }
+
+        .oracle-orb.intense {
+            animation: orbIntense 0.5s ease-in-out infinite;
+            box-shadow:
+                0 0 80px rgba(244, 208, 63, 0.8),
+                0 0 160px rgba(244, 208, 63, 0.6),
+                0 0 240px rgba(244, 208, 63, 0.4),
+                inset 0 0 80px rgba(255, 255, 255, 0.5);
+        }
+
+        @keyframes orbPulse {
+            0%, 100% {
+                transform: scale(1);
+                opacity: 0.9;
+            }
+            50% {
+                transform: scale(1.05);
+                opacity: 1;
+            }
+        }
+
+        @keyframes orbIntense {
+            0%, 100% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.1);
+            }
+        }
+
+        /* Orbital rings */
+        .orbital-ring {
+            position: absolute;
+            border: 1px solid rgba(244, 208, 63, 0.3);
+            border-radius: 50%;
+            animation: orbitRotate 20s linear infinite;
+        }
+
+        .orbital-ring:nth-child(2) {
+            width: 180px;
+            height: 180px;
+            animation-duration: 25s;
+            animation-direction: reverse;
+        }
+
+        .orbital-ring:nth-child(3) {
+            width: 220px;
+            height: 220px;
+            animation-duration: 30s;
+        }
+
+        @keyframes orbitRotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        .orbital-ring::before {
+            content: '';
+            position: absolute;
+            width: 8px;
+            height: 8px;
+            background: var(--accent-gold);
+            border-radius: 50%;
+            top: -4px;
+            left: 50%;
+            transform: translateX(-50%);
+            box-shadow: 0 0 10px var(--accent-gold);
+        }
+
+        /* Prompt Text */
+        .prompt {
+            font-size: 1.5rem;
+            font-style: italic;
+            opacity: 0.8;
+            margin-bottom: 1.5rem;
+            text-align: center;
+        }
+
+        /* Question Input */
+        .input-container {
+            position: relative;
+            width: 100%;
+            max-width: 500px;
+        }
+
+        .question-input {
+            width: 100%;
+            padding: 1rem 1.5rem;
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.3rem;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(244, 208, 63, 0.3);
+            border-radius: 50px;
+            color: var(--text-ivory);
+            outline: none;
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+
+        .question-input::placeholder {
+            color: rgba(245, 245, 220, 0.5);
+            font-style: italic;
+        }
+
+        .question-input:focus {
+            border-color: var(--accent-gold);
+            box-shadow:
+                0 0 20px rgba(244, 208, 63, 0.3),
+                0 0 40px rgba(244, 208, 63, 0.1),
+                inset 0 0 20px rgba(244, 208, 63, 0.1);
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        /* Loading State */
+        .loading-text {
+            font-size: 1.3rem;
+            font-style: italic;
+            color: var(--accent-gold);
+            margin-top: 2rem;
+            opacity: 0;
+            transition: opacity 0.5s ease;
+        }
+
+        .loading-text.visible {
+            opacity: 1;
+            animation: loadingPulse 1.5s ease-in-out infinite;
+        }
+
+        @keyframes loadingPulse {
+            0%, 100% { opacity: 0.6; }
+            50% { opacity: 1; }
+        }
+
+        /* Constellation Container */
+        .constellation-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 2;
+            pointer-events: none;
+        }
+
+        .constellation-svg {
+            width: 100%;
+            height: 100%;
+        }
+
+        .constellation-line {
+            stroke: var(--mystic-purple);
+            stroke-width: 1.5;
+            fill: none;
+            stroke-dasharray: 1000;
+            stroke-dashoffset: 1000;
+            opacity: 0.6;
+            filter: drop-shadow(0 0 3px var(--mystic-purple));
+        }
+
+        .constellation-line.animated {
+            animation: drawLine 2s ease forwards;
+        }
+
+        @keyframes drawLine {
+            to {
+                stroke-dashoffset: 0;
+            }
+        }
+
+        .constellation-star {
+            fill: var(--celestial-blue);
+            filter: drop-shadow(0 0 5px var(--celestial-blue));
+        }
+
+        .constellation-star.twinkle {
+            animation: twinkle 2s ease-in-out infinite;
+        }
+
+        @keyframes twinkle {
+            0%, 100% {
+                opacity: 1;
+                transform: scale(1);
+            }
+            50% {
+                opacity: 0.5;
+                transform: scale(0.8);
+            }
+        }
+
+        /* Answer Display */
+        .answer-container {
+            max-width: 600px;
+            text-align: center;
+            padding: 2rem;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.8s ease;
+            z-index: 15;
+        }
+
+        .answer-container.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .answer-text {
+            font-size: 1.5rem;
+            font-style: italic;
+            line-height: 1.8;
+            color: var(--text-ivory);
+            text-shadow: 0 0 10px rgba(245, 245, 220, 0.3);
+        }
+
+        /* Reset Button */
+        .reset-btn {
+            margin-top: 2rem;
+            padding: 1rem 2.5rem;
+            font-family: 'Cinzel Decorative', serif;
+            font-size: 1rem;
+            background: transparent;
+            border: 1px solid var(--accent-gold);
+            color: var(--accent-gold);
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            opacity: 0;
+            visibility: hidden;
+        }
+
+        .reset-btn.visible {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .reset-btn:hover {
+            background: rgba(244, 208, 63, 0.2);
+            box-shadow: 0 0 30px rgba(244, 208, 63, 0.4);
+            transform: scale(1.05);
+        }
+
+        /* Hidden state */
+        .hidden {
+            display: none !important;
+        }
+
+        /* Particle burst */
+        .particle-burst {
+            position: fixed;
+            pointer-events: none;
+            z-index: 3;
+        }
+
+        .burst-particle {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: var(--accent-gold);
+            border-radius: 50%;
+            box-shadow: 0 0 10px var(--accent-gold);
+        }
+    </style>
+</head>
+<body>
+    <div class="cosmic-bg"></div>
+    <canvas id="starCanvas"></canvas>
+    <div class="vignette"></div>
+
+    <div class="container">
+        <h1 class="title">The Starlight Oracle</h1>
+
+        <div class="oracle-container">
+            <div class="orbital-ring"></div>
+            <div class="orbital-ring"></div>
+            <div class="orbital-ring"></div>
+            <div class="oracle-orb" id="oracleOrb"></div>
+        </div>
+
+        <p class="prompt" id="prompt">Ask me anything...</p>
+
+        <div class="input-container" id="inputContainer">
+            <input
+                type="text"
+                class="question-input"
+                id="questionInput"
+                placeholder="What mysteries shall be revealed?"
+                autocomplete="off"
+            >
+        </div>
+
+        <p class="loading-text" id="loadingText">Consulting the stars...</p>
+
+        <div class="answer-container" id="answerContainer">
+            <p class="answer-text" id="answerText"></p>
+        </div>
+
+        <button class="reset-btn" id="resetBtn">Ask Another Question</button>
+    </div>
+
+    <div class="constellation-container" id="constellationContainer">
+        <svg class="constellation-svg" id="constellationSvg"></svg>
+    </div>
+
+    <script>
+        // Mystical Answers
+        const mysticalAnswers = [
+            "The stars whisper that your path winds through unexpected gardens. Trust the detours.",
+            "A golden thread connects your deepest desire to your next breath. Follow it gently.",
+            "The cosmos reveals: what you seek has already begun its journey to you.",
+            "Like the moon governs the tides, your patience guides the unfolding of your fate.",
+            "The constellations speak of a threshold near—step through with both courage and grace.",
+            "Your question echoes in the void, and the void answers: all things in their perfect season.",
+            "The stars align to show that silence holds more wisdom than many words.",
+            "A transformation approaches like dawn. You need only open your eyes to see it.",
+            "The universe conspirates in your favor, though its methods may seem mysterious.",
+            "Your destiny is a tapestry being woven by hands more skilled than any mortal.",
+            "The answer floats within you like a star beneath still waters—look inward to see.",
+            "The celestial spheres turn toward abundance in your near future. Prepare to receive.",
+            "What you release today becomes the soil for tomorrow's blooms.",
+            "The ancient lights confirm: your worth is not measured by those who cannot see your glow.",
+            "A meeting of minds awaits around the next corner. Bring your truest self."
+        ];
+
+        // DOM Elements
+        const starCanvas = document.getElementById('starCanvas');
+        const ctx = starCanvas.getContext('2d');
+        const oracleOrb = document.getElementById('oracleOrb');
+        const prompt = document.getElementById('prompt');
+        const inputContainer = document.getElementById('inputContainer');
+        const questionInput = document.getElementById('questionInput');
+        const loadingText = document.getElementById('loadingText');
+        const answerContainer = document.getElementById('answerContainer');
+        const answerText = document.getElementById('answerText');
+        const resetBtn = document.getElementById('resetBtn');
+        const constellationSvg = document.getElementById('constellationSvg');
+
+        // State
+        let stars = [];
+        let animationId;
+        let isAsking = false;
+
+        // Resize canvas
+        function resizeCanvas() {
+            starCanvas.width = window.innerWidth;
+            starCanvas.height = window.innerHeight;
+            initStars();
+        }
+
+        // Initialize stars
+        function initStars() {
+            stars = [];
+            const numStars = Math.floor((starCanvas.width * starCanvas.height) / 8000);
+
+            for (let i = 0; i < numStars; i++) {
+                stars.push({
+                    x: Math.random() * starCanvas.width,
+                    y: Math.random() * starCanvas.height,
+                    radius: Math.random() * 1.5 + 0.5,
+                    alpha: Math.random() * 0.5 + 0.3,
+                    twinkleSpeed: Math.random() * 0.02 + 0.01,
+                    twinklePhase: Math.random() * Math.PI * 2
+                });
+            }
+        }
+
+        // Draw stars
+        function drawStars() {
+            ctx.clearRect(0, 0, starCanvas.width, starCanvas.height);
+
+            stars.forEach(star => {
+                star.twinklePhase += star.twinkleSpeed;
+                const alpha = star.alpha + Math.sin(star.twinklePhase) * 0.3;
+
+                ctx.beginPath();
+                ctx.arc(star.x, star.y, star.radius, 0, Math.PI * 2);
+                ctx.fillStyle = `rgba(255, 255, 255, ${Math.max(0.1, alpha)})`;
+                ctx.fill();
+
+                // Glow effect for brighter stars
+                if (star.radius > 1) {
+                    ctx.beginPath();
+                    ctx.arc(star.x, star.y, star.radius * 2, 0, Math.PI * 2);
+                    ctx.fillStyle = `rgba(200, 220, 255, ${alpha * 0.2})`;
+                    ctx.fill();
+                }
+            });
+
+            animationId = requestAnimationFrame(drawStars);
+        }
+
+        // Generate constellation
+        function generateConstellation() {
+            const centerX = window.innerWidth / 2;
+            const centerY = window.innerHeight / 2 - 50;
+            const numStars = Math.floor(Math.random() * 4) + 6; // 6-9 stars
+            const constellationStars = [];
+
+            // Generate star positions radiating from center
+            for (let i = 0; i < numStars; i++) {
+                const angle = (i / numStars) * Math.PI * 2 + Math.random() * 0.5;
+                const distance = 80 + Math.random() * 200;
+                constellationStars.push({
+                    x: centerX + Math.cos(angle) * distance,
+                    y: centerY + Math.sin(angle) * distance,
+                    delay: i * 0.3
+                });
+            }
+
+            // Add center star
+            constellationStars.push({
+                x: centerX,
+                y: centerY,
+                delay: numStars * 0.3
+            });
+
+            return constellationStars;
+        }
+
+        // Draw constellation
+        function drawConstellation(stars) {
+            constellationSvg.innerHTML = '';
+
+            // Generate connections
+            const connections = [];
+            const centerIndex = stars.length - 1;
+
+            // Connect outer stars to neighbors and center
+            for (let i = 0; i < stars.length - 1; i++) {
+                // Connect to next outer star
+                if (i < stars.length - 2) {
+                    connections.push([stars[i], stars[i + 1]]);
+                }
+                // Connect to center
+                connections.push([stars[i], stars[centerIndex]]);
+            }
+
+            // Animate lines
+            connections.forEach((conn, index) => {
+                setTimeout(() => {
+                    const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+                    line.setAttribute('x1', conn[0].x);
+                    line.setAttribute('y1', conn[0].y);
+                    line.setAttribute('x2', conn[1].x);
+                    line.setAttribute('y2', conn[1].y);
+                    line.classList.add('constellation-line', 'animated');
+                    constellationSvg.appendChild(line);
+                }, index * 200);
+            });
+
+            // Animate stars appearing
+            stars.forEach((star, index) => {
+                setTimeout(() => {
+                    const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+                    circle.setAttribute('cx', star.x);
+                    circle.setAttribute('cy', star.y);
+                    circle.setAttribute('r', '4');
+                    circle.classList.add('constellation-star');
+
+                    // Random twinkle delay
+                    setTimeout(() => {
+                        circle.classList.add('twinkle');
+                    }, index * 200);
+
+                    constellationSvg.appendChild(circle);
+                }, star.delay * 1000);
+            });
+        }
+
+        // Clear constellation
+        function clearConstellation() {
+            constellationSvg.innerHTML = '';
+        }
+
+        // Handle question submission
+        function handleQuestion() {
+            if (isAsking || !questionInput.value.trim()) return;
+
+            isAsking = true;
+            const question = questionInput.value.trim();
+
+            // UI updates
+            inputContainer.classList.add('hidden');
+            prompt.classList.add('hidden');
+            oracleOrb.classList.add('intense');
+            loadingText.classList.add('visible');
+
+            // Create particle burst effect
+            createParticleBurst();
+
+            // Simulate thinking
+            setTimeout(() => {
+                loadingText.classList.remove('visible');
+                oracleOrb.classList.remove('intense');
+
+                // Generate and draw constellation
+                const constellation = generateConstellation();
+                drawConstellation(constellation);
+
+                // Show answer
+                const answer = mysticalAnswers[Math.floor(Math.random() * mysticalAnswers.length)];
+                answerText.textContent = `"${answer}"`;
+                answerContainer.classList.add('visible');
+
+                // Show reset button
+                resetBtn.classList.add('visible');
+
+                isAsking = false;
+            }, 2500);
+        }
+
+        // Create particle burst
+        function createParticleBurst() {
+            const container = document.createElement('div');
+            container.classList.add('particle-burst');
+            document.body.appendChild(container);
+
+            const centerX = window.innerWidth / 2;
+            const centerY = window.innerHeight / 2 - 50;
+
+            for (let i = 0; i < 30; i++) {
+                const particle = document.createElement('div');
+                particle.classList.add('burst-particle');
+
+                const angle = (i / 30) * Math.PI * 2;
+                const distance = 100 + Math.random() * 150;
+                const duration = 1 + Math.random() * 0.5;
+
+                particle.style.left = centerX + 'px';
+                particle.style.top = centerY + 'px';
+                particle.style.animation = `burst ${duration}s ease-out forwards`;
+                particle.style.setProperty('--dx', Math.cos(angle) * distance + 'px');
+                particle.style.setProperty('--dy', Math.sin(angle) * distance + 'px');
+
+                container.appendChild(particle);
+            }
+
+            // Add burst animation
+            const style = document.createElement('style');
+            style.textContent = `
+                @keyframes burst {
+                    to {
+                        transform: translate(var(--dx), var(--dy));
+                        opacity: 0;
+                    }
+                }
+            `;
+            document.head.appendChild(style);
+
+            setTimeout(() => {
+                container.remove();
+                style.remove();
+            }, 2000);
+        }
+
+        // Reset to initial state
+        function resetOracle() {
+            answerContainer.classList.remove('visible');
+            resetBtn.classList.remove('visible');
+            clearConstellation();
+
+            setTimeout(() => {
+                inputContainer.classList.remove('hidden');
+                prompt.classList.remove('hidden');
+                questionInput.value = '';
+                questionInput.focus();
+            }, 500);
+        }
+
+        // Event listeners
+        questionInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                handleQuestion();
+            }
+        });
+
+        resetBtn.addEventListener('click', resetOracle);
+
+        window.addEventListener('resize', resizeCanvas);
+
+        // Initialize
+        resizeCanvas();
+        drawStars();
+    </script>
+</body>
+</html>
